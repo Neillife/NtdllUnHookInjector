@@ -17,7 +17,7 @@ namespace NtdllUnHookInjector.Core.Services
             si.cb = Marshal.SizeOf(typeof(STARTUPINFO));
             string workingDir = Path.GetDirectoryName(appPath);
 
-            if (!CreateProcessW(appPath, null, IntPtr.Zero, IntPtr.Zero, false,
+            if (!CreateProcess(appPath, null, IntPtr.Zero, IntPtr.Zero, false,
                     ProcessCreationFlags.CREATE_SUSPENDED, IntPtr.Zero, workingDir, ref si, out pi))
             {
                 throw new InvalidOperationException($"Unable to create a process in suspended state. Error code: {Marshal.GetLastWin32Error()}");

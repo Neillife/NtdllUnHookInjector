@@ -2,6 +2,7 @@
 using NtdllUnHookInjector.Core.Payloads;
 using NtdllUnHookInjector.Core.Services;
 using static NtdllUnHookInjector.Native.NativeMethods;
+using static NtdllUnHookInjector.Native.Delegates;
 
 namespace NtdllUnHookInjector.Core.Strategies
 {
@@ -35,7 +36,9 @@ namespace NtdllUnHookInjector.Core.Strategies
 
                 // 3. 恢復主執行緒，並傳入正確的句柄
                 // 直接在這裡呼叫 ResumeThread，或者將其包裝在一個輔助方法中
-                ResumeThread(processInfo.ThreadHandle);
+                var NtResumeThread = UnhookService.LoadFunction<NtResumeThreadDelegate>(UnhookService.GetNtdll(), "NtResumeThread");
+                uint status = NtResumeThread(processInfo.ThreadHandle, out uint prevSuspend);
+                UnhookService.CheckStatus(status, processInfo.ProcessHandle, "NtResumeThread");
             }
             finally
             {
