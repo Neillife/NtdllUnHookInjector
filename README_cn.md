@@ -115,7 +115,7 @@ NtdllUnHookInjector.exe wait myapp.exe "C:\path\to\NtdllUnHookInjector\TestInjec
 
 ## 📜 授權
 
-本專案的原始程式碼以 MIT 授權條款發布，詳情請見 [LICENSE]([https://github.com/Neillife/NtdllUnHookInjector/LICENSE](https://github.com/Neillife/NtdllUnHookInjector/blob/master/LICENSE))。
+本專案的原始程式碼以 MIT 授權條款發布，詳情請見 [LICENSE](https://github.com/Neillife/NtdllUnHookInjector/blob/master/LICENSE)。
 
 ---
 
