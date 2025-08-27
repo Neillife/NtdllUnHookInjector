@@ -10,7 +10,7 @@
   <p align="center">
     中文
 	| 
-    <a href="https://github.com/Neillife/NtdllUnHookInjector/README.md">English</a>
+    <a href="https://github.com/Neillife/NtdllUnHookInjector/blob/master/README.md">English</a>
   </p>
 </div>
 
@@ -72,7 +72,7 @@ NtdllUnHookInjector/
 
 
 ## 🚀 使用方法
-- **Payload 檔案** ： 如果你想測試注入，[TestInjectFile](https://github.com/Neillife/NtdllUnHookInjector/TestInjectFile) 中已經有使用 C++ 編譯的彈窗 DLL。
+- **Payload 檔案** ： 如果你想測試注入，[TestInjectFile](https://github.com/Neillife/NtdllUnHookInjector/tree/master/NtdllUnHookInjector/TestInjectFile) 中已經有使用 C++ 編譯的彈窗 DLL。
   - **DLL** ： **`MessageBox32.dll`** / **`MessageBox64.dll`**
   - **Shellcode**：**`MessageBox32.bin`** / **`MessageBox64.bin`**
 - **權限**：由於涉及進階操作，請確保目標的 Process 的位元 (**`x32`** / **`x64`**) 以及是否需要 **系統管理員身分** 以及使用正確位元的 32 或 64 注入器。
@@ -115,7 +115,7 @@ NtdllUnHookInjector.exe wait myapp.exe "C:\path\to\NtdllUnHookInjector\TestInjec
 
 ## 📜 授權
 
-本專案的原始程式碼以 MIT 授權條款發布，詳情請見 [LICENSE](https://github.com/Neillife/NtdllUnHookInjector/LICENSE)。
+本專案的原始程式碼以 MIT 授權條款發布，詳情請見 [LICENSE]([https://github.com/Neillife/NtdllUnHookInjector/LICENSE](https://github.com/Neillife/NtdllUnHookInjector/blob/master/LICENSE))。
 
 ---
 
@@ -123,3 +123,18 @@ NtdllUnHookInjector.exe wait myapp.exe "C:\path\to\NtdllUnHookInjector\TestInjec
 
 **本專案的原始程式碼僅供教育和研究目的使用，  
 🚫請勿用於非法用途。作者對任何誤用不承擔責任。**
+
+
+
+
+
+[contributors-shield]: https://img.shields.io/github/contributors/Neillife/NtdllUnHookInjector.svg?style=for-the-badge
+[contributors-url]: https://github.com/Neillife/NtdllUnHookInjector/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/Neillife/NtdllUnHookInjector.svg?style=for-the-badge
+[forks-url]: https://github.com/Neillife/NtdllUnHookInjector/network/members
+[stars-shield]: https://img.shields.io/github/stars/Neillife/NtdllUnHookInjector.svg?style=for-the-badge
+[stars-url]: https://github.com/Neillife/NtdllUnHookInjector/stargazers
+[issues-shield]: https://img.shields.io/github/issues/Neillife/NtdllUnHookInjector.svg?style=for-the-badge
+[issues-url]: https://github.com/Neillife/NtdllUnHookInjector/issues
+[license-shield]: https://img.shields.io/github/license/Neillife/NtdllUnHookInjector.svg?style=for-the-badge
+[license-url]: https://github.com/Neillife/NtdllUnHookInjector/blob/master/LICENSE
