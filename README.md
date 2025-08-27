@@ -8,7 +8,7 @@
   <h2 align="center">🧬 NtdllUnHookInjector</h3>
 
   <p align="center">
-    <a href="https://github.com/Neillife/NtdllUnHookInjector/README_cn.md">中文</a> 
+    <a href="https://github.com/Neillife/NtdllUnHookInjector/blob/master/README_cn.md">中文</a> 
 	| 
     English
   </p>
@@ -56,7 +56,7 @@ NtdllUnHookInjector/
 
 
 ## 🚀 Usage
-- **Payload File**: If you want to test injection, [TestInjectFile](https://github.com/Neillife/NtdllUnHookInjector/TestInjectFile) already has a popup DLL compiled in C++.
+- **Payload File**: If you want to test injection, [TestInjectFile](https://github.com/Neillife/NtdllUnHookInjector/tree/master/NtdllUnHookInjector/TestInjectFile) already has a popup DLL compiled in C++.
   - **DLL**: **`MessageBox32.dll`** / **`MessageBox64.dll`**
   - **Shellcode**: **`MessageBox32.bin`** / **`MessageBox64.bin`**
 - **Permissions**: Since advanced operations are involved, make sure the target process matches the injector architecture (x32 / x64) and that you run as Administrator if required.
@@ -96,7 +96,7 @@ Open in Visual Studio 2019+
 
 ## 📜 License
 
-MIT – see [LICENSE](https://github.com/Neillife/NtdllUnHookInjector/LICENSE)。
+MIT – see [LICENSE](https://github.com/Neillife/NtdllUnHookInjector/blob/master/LICENSE)。
 
 
 ## ⚠️ Disclaimer
@@ -115,5 +115,5 @@ This project is intended for educational and research purposes only.
 [stars-url]: https://github.com/Neillife/NtdllUnHookInjector/stargazers
 [issues-shield]: https://img.shields.io/github/issues/Neillife/NtdllUnHookInjector.svg?style=for-the-badge
 [issues-url]: https://github.com/Neillife/NtdllUnHookInjector/issues
-<!--[license-shield]: https://img.shields.io/github/license/Neillife/NtdllUnHookInjector.svg?style=for-the-badge
-[license-url]: https://github.com/Neillife/NtdllUnHookInjector/blob/master/LICENSE-->
+[license-shield]: https://img.shields.io/github/license/Neillife/NtdllUnHookInjector.svg?style=for-the-badge
+[license-url]: https://github.com/Neillife/NtdllUnHookInjector/blob/master/LICENSE
